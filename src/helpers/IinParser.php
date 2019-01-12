@@ -9,17 +9,21 @@ class IinParser {
 	
 	const IIN_LENGTH = 12;
 	
-	/**
-	 * @param $value
-	 *
-	 * @return mixed
-	 * @throws Exception
-	 * @deprecated use \yii2woop\operation\domain\v2\helpers\iin\IinParser::parse()
-	 */
+	public static function getInfo($iin) {
+		$iinData = self::parse($iin);
+		$result = [];
+		$result['sex'] = $iinData['sex'] == 'female';
+		$result['birth_date'] = $iinData['date']['year'] . '-' . $iinData['date']['month'] . '-' . $iinData['date']['day'];
+		$result['serial_number'] = $iinData['serial_number'];
+		$result['check_sum'] = $iinData['check_sum'];
+		return $result;
+	}
+	
 	public static function parse($value) {
 		self::validate($value);
 		$part['date'] = IinDateHelper::parseDate($value);
-		$part['number'] = substr($value, 7, 4);
+		$part['serial_number'] = substr($value, 7, 4);
+		$part['check_sum'] = substr($value, 11, 1);
 		$part['sex'] = self::getSex($value);
 		//self::validateSum($value);
 		return $part;
